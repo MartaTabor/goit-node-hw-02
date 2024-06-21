@@ -1,11 +1,26 @@
 const express = require("express");
+const Joi = require("joi");
 const {
   listContacts,
   getContactById,
   removeContact,
+  addContact,
 } = require("../../models/contacts");
 
 const router = express.Router();
+
+const schema = Joi.object({
+  name: Joi.string().required().messages({
+    "any.required": "Missing required name field",
+  }),
+  email: Joi.string().email().required().messages({
+    "any.required": "Missing required email field",
+    "string.email": "Email must be a valid email address",
+  }),
+  phone: Joi.string().required().messages({
+    "any.required": "Missing required phone field",
+  }),
+});
 
 router.get("/", async (req, res, next) => {
   try {
@@ -31,7 +46,19 @@ router.get("/:contactId", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {});
+router.post("/", async (req, res, next) => {
+  try {
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    } else {
+      const newContact = await addContact(req.body);
+      res.status(201).json(newContact);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.delete("/:contactId", async (req, res, next) => {
   try {
