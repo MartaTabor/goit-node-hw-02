@@ -87,11 +87,8 @@ router.put("/:contactId", async (req, res, next) => {
 
     const updatedContact = await updateContact(contactId, req.body);
 
-    if (updateContact) {
-      res.status(200).json(updatedContact);
-    } else {
-      res.status(404).json({ message: "Not Found" });
-    }
+    if (updateContact) res.status(200).json(updatedContact);
+    res.status(404).json({ message: "Not Found" });
   } catch (error) {
     next(error);
   }
