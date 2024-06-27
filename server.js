@@ -7,12 +7,16 @@ const PORT = process.env.MAIN_PORT;
 
 const connection = mongoose.connect(uriDB);
 
-connection
-  .then(() => {
+const serverStart = async () => {
+  try {
+    await connection;
     app.listen(PORT, () => {
-      console.log(`Server running. Use our API on port: ${PORT}`);
+      console.log("Database connection successful.");
     });
-  })
-  .catch((err) =>
-    console.log(`Server not running. Error message: ${err.message}`)
-  );
+  } catch (error) {
+    console.log("Database connection fail");
+    process.exit(1);
+  }
+};
+
+serverStart();
