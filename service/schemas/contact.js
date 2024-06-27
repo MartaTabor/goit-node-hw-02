@@ -27,4 +27,6 @@ const contact = new Schema({
 
 const Contact = mongoose.model("contact", contact);
 
+contact.index({ name: 1 });
+
 module.export = Contact;
