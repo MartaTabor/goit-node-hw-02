@@ -80,9 +80,9 @@ const update = async (req, res, next) => {
 
 const updateStatus = async (req, res, next) => {
   const { id } = req.params;
-  const { favourite = false } = req.body;
+  const { favorite = false } = req.body;
   try {
-    const result = await service.updateContact(id, { favourite });
+    const result = await service.updateContact(id, { favorite });
     if (result) {
       res.json({
         status: "sucess",

@@ -5,12 +5,9 @@ const contact = new Schema({
   name: {
     type: String,
     required: [true, "Name Field is required"],
-    minLength: 2,
-    maxLength: 25,
   },
   email: {
     type: String,
-    required: [true, "E-mail Field is required"],
     unique: true,
     validate: {
       validator: function (v) {
@@ -21,7 +18,10 @@ const contact = new Schema({
   },
   phone: {
     type: String,
-    required: [true, "Phone Field is required"],
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
   },
 });
 
