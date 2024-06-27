@@ -1,75 +1,136 @@
-// const fs = require("fs").promises;
-// const path = require("path");
-// const { v4: uuidv4 } = require("uuid");
-// const contactsPath = path.join(__dirname, "..", "models", "contacts.json");
+const service = require("../service/index");
 
-const listContacts = async () => {
+const get = async (req, res, next) => {
   try {
-    const data = await fs.readFile(contactsPath);
-    return JSON.parse(data);
+    const results = await service.getAllContacts();
+    res.json({
+      status: "sucess",
+      code: 200,
+      data: { contacts: results },
+    });
   } catch (error) {
     console.error("Error fetching contacts: ", error);
-    throw error;
+    next(error);
   }
 };
 
-const getContactById = async (contactId) => {
+const getById = async (req, res, next) => {
+  const { id } = req.params;
   try {
-    const contacts = await listContacts();
-    return contacts.find((contact) => contact.id === String(contactId)) || null;
+    const result = await service.getContactById(id);
+    if (result) {
+      res.json({
+        status: "sucess",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Contact with id: ${id} not found`,
+        data: "Not Found",
+      });
+    }
   } catch (error) {
     console.error("Error finding contact: ", error);
-    throw error;
+    next(error);
   }
 };
 
-const removeContact = async (contactId) => {
+const create = async (req, res, next) => {
+  const { name, email, phone } = req.body;
   try {
-    const contacts = await listContacts();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index === -1) return null;
-
-    const [removedContact] = contacts.splice(index, 1);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-    return removedContact;
-  } catch (error) {
-    console.error("Error removing contact: ", error);
-    throw error;
-  }
-};
-
-const addContact = async (body) => {
-  try {
-    const contacts = await listContacts();
-    const newContact = { id: uuidv4(), ...body };
-    contacts.push(newContact);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-    return newContact;
+    const result = await service.createContact({ name, email, phone });
+    res.status(201).json({
+      status: "sucess",
+      code: 201,
+      data: { contact: result },
+    });
   } catch (error) {
     console.error("Error adding contact: ", error);
-    throw error;
+    next(error);
   }
 };
 
-const updateContact = async (contactId, body) => {
+const update = async (req, res, next) => {
+  const { id } = req.params;
+  const { name, email, phone } = req.body;
   try {
-    const contacts = await listContacts();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index === -1) return null;
-
-    contacts[index] = { ...contacts[index], ...body };
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-    return contacts[index];
+    const result = await service.updateContact(id, { name, email, phone });
+    if (result) {
+      res.json({
+        status: "sucess",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Contact with id: ${id} not found`,
+        data: "Not Found",
+      });
+    }
   } catch (error) {
     console.error("Error updating contact: ", error);
-    throw error;
+    next(error);
+  }
+};
+
+const updateStatus = async (req, res, next) => {
+  const { id } = req.params;
+  const { favourite = false } = req.body;
+  try {
+    const result = await service.updateContact(id, { favourite });
+    if (result) {
+      res.json({
+        status: "sucess",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Contact with id: ${id} not found`,
+        data: "Not Found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const remove = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const result = await service.removeContact(id);
+    if (result) {
+      res.json({
+        status: "sucess",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Contact with id: ${id} not found`,
+        data: "Not Found",
+      });
+    }
+  } catch (error) {
+    console.error("Error removing contact: ", error);
+    next(error);
   }
 };
 
 module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
+  get,
+  getById,
+  create,
+  update,
+  updateStatus,
+  remove,
 };
