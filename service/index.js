@@ -13,7 +13,10 @@ const createContact = ({ name, email, phone }) => {
 };
 
 const updateContact = (id, fields) => {
-  return Contact.findOneAndUpdate({ _id: id }, fields, { new: true });
+  return Contact.findOneAndUpdate({ _id: id }, fields, {
+    new: true,
+    runValidators: true,
+  });
 };
 
 const removeContact = (id) => {

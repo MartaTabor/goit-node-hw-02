@@ -18,6 +18,7 @@ const contactSchema = new Schema({
   },
   phone: {
     type: String,
+    required: [true, "Phone Field is required"],
   },
   favorite: {
     type: Boolean,

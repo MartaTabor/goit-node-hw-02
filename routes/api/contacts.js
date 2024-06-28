@@ -10,7 +10,7 @@ router.post("/", ctrlContact.create);
 
 router.put("/:id", ctrlContact.update);
 
-router.patch("/:id/status", ctrlContact.updateStatus);
+router.patch("/:id/favorite", ctrlContact.updateStatus);
 
 router.delete("/:id", ctrlContact.remove);
 
