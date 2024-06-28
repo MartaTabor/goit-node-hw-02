@@ -13,11 +13,11 @@ const createContact = ({ name, email, phone }) => {
 };
 
 const updateContact = (id, fields) => {
-  return Contact.findByIdAndUpdate({ _id: id }, fields, { new: true });
+  return Contact.findOneAndUpdate({ _id: id }, fields, { new: true });
 };
 
 const removeContact = (id) => {
-  return Contact.findByIdAndRemove({ _id: id });
+  return Contact.findOneAndDelete({ _id: id });
 };
 
 module.exports = {

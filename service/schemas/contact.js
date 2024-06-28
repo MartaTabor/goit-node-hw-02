@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const contact = new Schema({
+const contactSchema = new Schema({
   name: {
     type: String,
     required: [true, "Name Field is required"],
@@ -25,8 +25,8 @@ const contact = new Schema({
   },
 });
 
-const Contact = mongoose.model("contact", contact);
+const Contact = mongoose.model("Contact", contactSchema);
 
-contact.index({ name: 1 });
+contactSchema.index({ name: 1 });
 
-module.export = Contact;
+module.exports = Contact;
