@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const contactSchema = new Schema({
   name: {
     type: String,
-    required: [true, "Name Field is required"],
+    required: true,
   },
   email: {
     type: String,
