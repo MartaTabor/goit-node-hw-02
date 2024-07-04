@@ -15,14 +15,17 @@ const params = {
 };
 
 passport.use(
-  new Strategy(params, (payload, done) => {
-    User.find({ _id: payload.id })
-      .then(([user]) => {
-        if (!user) {
-          return done(new Error("User not found"));
-        }
-        return done(null, user);
-      })
-      .catch((err) => done(err));
+  new Strategy(params, async (payload, done) => {
+    try {
+      const user = await User.findById(payload.id);
+      if (!user) {
+        return done(new Error("User not found"), false);
+      }
+      return done(null, user);
+    } catch (error) {
+      return done(error, false);
+    }
   })
 );
+
+module.exports = passport;
