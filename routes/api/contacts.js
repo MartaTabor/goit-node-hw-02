@@ -6,6 +6,9 @@ const {
   contactSchema,
   favoriteSchema,
 } = require("../../validation/contactValidation");
+const auth = require("../../middlewares/jwtMiddleware");
+
+router.use(auth);
 
 router.get("/", ctrlContact.get);
 
