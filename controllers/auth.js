@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const User = require("../service/schemas/user");
-const { userSchema } = require("../validation/userValidation");
 
 require("dotenv").config();
 
@@ -8,11 +7,6 @@ const secret = process.env.SECRET;
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
-
-  const { error } = userSchema.validate({ email, password });
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
 
   try {
     const existingUser = await User.findOne({ email });
@@ -25,6 +19,7 @@ const register = async (req, res, next) => {
     await newUser.save();
 
     res.status(201).json({
+      status: "success",
       user: {
         email: newUser.email,
         subscription: newUser.subscription,

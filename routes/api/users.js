@@ -15,7 +15,7 @@ router.use(passport.initialize());
 
 router.post("/signup", validateBody(userSchema), register);
 router.post("/login", validateBody(userSchema), login);
-router.get("./logout", auth, logout);
+router.get("/logout", auth, logout);
 router.get("/current", auth, getCurrentUser);
 
 module.exports = router;
