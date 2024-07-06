@@ -1,9 +1,17 @@
 const service = require("../service/index");
 
 const get = async (req, res, next) => {
+  const { page = 1, limit = 20, favorite } = req.query;
+  const skip = (page - 1) * limit;
+  const userId = req.user._id;
+
+  const filter = { owner: userId };
+  if (favorite !== undefined) {
+    filter.favorite = favorite === "true";
+  }
+
   try {
-    const userId = req.user._id;
-    const results = await service.getAllContacts(userId);
+    const results = await service.getAllContacts(filter, skip, limit);
     res.json({
       status: "sucess",
       code: 200,
