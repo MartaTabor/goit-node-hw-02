@@ -87,9 +87,51 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
+const updateSubscription = async (req, res, next) => {
+  const { subscription } = req.body;
+  const validSubscriptions = ["starter", "pro", "business"];
+
+  if (!validSubscriptions.includes(subscription)) {
+    return res.status(400).json({
+      status: "error",
+      code: 400,
+      message: "Invalid subscription type",
+    });
+  }
+
+  try {
+    const userId = req.user._id;
+    const result = await User.findByIdAndUpdate(
+      userId,
+      { subscription },
+      { new: true }
+    );
+    if (result) {
+      res.json({
+        status: "success",
+        code: 200,
+        data: {
+          email: result.email,
+          subscription: result.subscription,
+        },
+      });
+    } else {
+      res.staus(404).json({
+        status: "error",
+        code: 404,
+        message: "User not found",
+        data: "Not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
   getCurrentUser,
+  updateSubscription,
 };
