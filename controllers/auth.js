@@ -31,10 +31,10 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (!user || !user.validPassword(password)) {
       return res.status(401).json({ message: "Email or password is wrong" });
     }
@@ -62,10 +62,20 @@ const login = async (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
-  const { _id } = req.user;
-
   try {
-    await User.findByIdAndUpdate(_id, { token: null });
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Not authorized",
+      });
+    }
+
+    user.token = null;
+    await user.save();
+
     res.status(204).send();
   } catch (error) {
     next(error);
