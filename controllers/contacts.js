@@ -2,7 +2,8 @@ const service = require("../service/index");
 
 const get = async (req, res, next) => {
   try {
-    const results = await service.getAllContacts();
+    const userId = req.user._id;
+    const results = await service.getAllContacts(userId);
     res.json({
       status: "sucess",
       code: 200,
@@ -16,8 +17,9 @@ const get = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user._id;
   try {
-    const result = await service.getContactById(id);
+    const result = await service.getContactById(userId, id);
     if (result) {
       res.json({
         status: "sucess",
@@ -40,8 +42,9 @@ const getById = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   const { name, email, phone } = req.body;
+  const userId = req.user._id;
   try {
-    const result = await service.createContact({ name, email, phone });
+    const result = await service.createContact(userId, { name, email, phone });
     res.status(201).json({
       status: "sucess",
       code: 201,
@@ -56,8 +59,13 @@ const create = async (req, res, next) => {
 const update = async (req, res, next) => {
   const { id } = req.params;
   const { name, email, phone } = req.body;
+  const userId = req.user._id;
   try {
-    const result = await service.updateContact(id, { name, email, phone });
+    const result = await service.updateContact(userId, id, {
+      name,
+      email,
+      phone,
+    });
     if (result) {
       res.json({
         status: "sucess",
@@ -81,6 +89,7 @@ const update = async (req, res, next) => {
 const updateStatus = async (req, res, next) => {
   const { id } = req.params;
   const { favorite } = req.body;
+  const userId = req.user._id;
 
   if (favorite === undefined) {
     return res.status(400).json({
@@ -89,7 +98,7 @@ const updateStatus = async (req, res, next) => {
   }
 
   try {
-    const result = await service.updateContact(id, { favorite });
+    const result = await service.updateContact(userId, id, { favorite });
     if (result) {
       res.json({
         status: "sucess",
@@ -111,8 +120,9 @@ const updateStatus = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user._id;
   try {
-    const result = await service.removeContact(id);
+    const result = await service.removeContact(userId, id);
     if (result) {
       res.json({
         status: "sucess",
