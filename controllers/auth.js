@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../service/schemas/user");
+const gravatar = require("gravatar");
 
 require("dotenv").config();
 
@@ -16,6 +17,7 @@ const register = async (req, res, next) => {
 
     const newUser = new User({ email });
     newUser.setPassword(password);
+    newUser.avatarURL = gravatar.url(email);
     await newUser.save();
 
     res.status(201).json({
@@ -54,6 +56,7 @@ const login = async (req, res, next) => {
       user: {
         email: user.email,
         subscription: user.subscription,
+        avatarURL: user.avatarURL,
       },
     });
   } catch (error) {
