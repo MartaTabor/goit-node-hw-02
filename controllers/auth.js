@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../service/schemas/user");
 const gravatar = require("gravatar");
+const fs = require("fs").promises;
+const path = require("path");
+const jimp = require("jimp");
 
 require("dotenv").config();
 
@@ -129,10 +132,43 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
+const avatarsDir = path.join(__dirname, "../public/avatars");
+
+const updateAvatar = async (req, res, next) => {
+  try {
+    const { path: tmpPath, originalname } = req.file;
+    const { _id: userId } = req.user;
+
+    const img = await jimp.read(tmpPath);
+    await img.resize(250, 250).writeAsync(tmpPath);
+
+    const uniqueName = `${userId}-${Date.now()}-${originalname}`;
+    const avatarURL = path.join("avatars", uniqueName);
+    const publicPath = path.join(avatarsDir, uniqueName);
+
+    await fs.rename(tmpPath, publicPath);
+
+    await User.findByIdAndUpdate(userId, { avatarURL }, { new: true });
+
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        avatarURL: `http://localhost:${
+          process.env.MAIN_PORT || 3000
+        }/${avatarURL}`,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
   getCurrentUser,
   updateSubscription,
+  updateAvatar,
 };
