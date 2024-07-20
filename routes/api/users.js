@@ -6,7 +6,7 @@ const {
   validateSubscription,
 } = require("../../validation/validation");
 const auth = require("../../middlewares/jwtMiddleware");
-const { userSchema } = require("../../validation/userValidation");
+const { userSchema, emailSchema } = require("../../validation/userValidation");
 const passport = require("../../middlewares/passport-config");
 const upload = require("../../middlewares/upload");
 const ctrlVer = require("../../controllers/verification");
@@ -20,5 +20,10 @@ router.get("/current", auth, ctrlAuth.getCurrentUser);
 router.patch("/", auth, validateSubscription, ctrlAuth.updateSubscription);
 router.patch("/avatars", auth, upload.single("avatar"), ctrlAuth.updateAvatar);
 router.get("verify/:verificationToken", ctrlVer);
+router.post(
+  "/verify",
+  validateBody(emailSchema),
+  ctrlAuth.resendVerificationEmail
+);
 
 module.exports = router;

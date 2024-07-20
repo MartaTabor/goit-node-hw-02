@@ -4,8 +4,8 @@ const gravatar = require("gravatar");
 const fs = require("fs").promises;
 const path = require("path");
 const jimp = require("jimp");
-const { uuid } = require("uuidv4");
-const { transporter } = require("../modules/nodemailer");
+const { v4: uuidv4 } = require("uuid");
+const { sendVerificationEmail } = require("../modules/nodemailer");
 
 require("dotenv").config();
 
@@ -20,39 +20,55 @@ const register = async (req, res, next) => {
       return res.status(409).json({ message: "Email in use" });
     }
 
-    const verificationToken = uuid();
+    const verificationToken = uuidv4();
 
     const newUser = new User({ email, verificationToken, verify: false });
     newUser.setPassword(password);
     newUser.avatarURL = gravatar.url(email, { protocol: "https", s: "100" });
     await newUser.save();
 
-    const mailOptions = {
-      from: "Contacts Database <no-reply@contacts.com",
-      to: email,
-      subject: "Verify your email",
-      html: `<a href="http://localhost:${
-        process.env.MAIN_PORT || 300
-      }/api/users/verify/${verificationToken}>Verify your email</a>`,
-    };
+    try {
+      await sendVerificationEmail(email, verificationToken);
+      res.status(201).json({
+        status: "success",
+        user: {
+          email: newUser.email,
+          subscription: newUser.subscription,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Failed to send verification email" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        return res
-          .status(500)
-          .json({ message: "Failed to send verification email" });
-      }
-      console.log("Email sent: " + info.response);
-    });
+const resendVerificationEmail = async (req, res, next) => {
+  const { email } = req.body;
 
-    res.status(201).json({
-      status: "success",
-      user: {
-        email: newUser.email,
-        subscription: newUser.subscription,
-      },
-    });
+  if (!email) {
+    return res.status(400).json({ message: "Missing required field email" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.verify) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+
+    const verificationToken = user.verificationToken;
+    await sendVerificationEmail(email, verificationToken);
+
+    res.status(200).json({ message: "Verification email sent" });
   } catch (error) {
     next(error);
   }
@@ -63,8 +79,13 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
-    if (!user || !user.validPassword(password)) {
-      return res.status(401).json({ message: "Email or password is wrong" });
+    if (!user || !user.validPassword(password) || !user.verify) {
+      return res
+        .status(401)
+        .json({
+          message:
+            "Email or password is wrong or you have not verified your email",
+        });
     }
 
     const payload = {
@@ -189,6 +210,7 @@ const updateAvatar = async (req, res, next) => {
 
 module.exports = {
   register,
+  resendVerificationEmail,
   login,
   logout,
   getCurrentUser,
