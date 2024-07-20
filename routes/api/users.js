@@ -9,6 +9,7 @@ const auth = require("../../middlewares/jwtMiddleware");
 const { userSchema } = require("../../validation/userValidation");
 const passport = require("../../middlewares/passport-config");
 const upload = require("../../middlewares/upload");
+const ctrlVer = require("../../controllers/verification");
 
 router.use(passport.initialize());
 
@@ -18,5 +19,6 @@ router.get("/logout", auth, ctrlAuth.logout);
 router.get("/current", auth, ctrlAuth.getCurrentUser);
 router.patch("/", auth, validateSubscription, ctrlAuth.updateSubscription);
 router.patch("/avatars", auth, upload.single("avatar"), ctrlAuth.updateAvatar);
+router.get("verify/:verificationToken", ctrlVer);
 
 module.exports = router;
