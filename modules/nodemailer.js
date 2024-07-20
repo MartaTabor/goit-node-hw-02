@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const { M_USER, M_PASS } = process.env;
 
 require("dotenv").config();
 
@@ -8,8 +7,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: M_USER,
-    pass: M_PASS,
+    user: process.env.M_USER,
+    pass: process.env.M_PASS,
   },
 });
 
@@ -19,8 +18,8 @@ const sendVerificationEmail = async (email, verificationToken) => {
     to: email,
     subject: "Verify your email",
     html: `<a href="http://localhost:${
-      process.env.MAIN_PORT || 300
-    }/api/users/verify/${verificationToken}>Verify your email</a>`,
+      process.env.MAIN_PORT || 3000
+    }/api/users/verify/${verificationToken}">Verify your email</a>`,
   };
 
   try {

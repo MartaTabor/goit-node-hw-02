@@ -34,6 +34,8 @@ const register = async (req, res, next) => {
         user: {
           email: newUser.email,
           subscription: newUser.subscription,
+          verify: newUser.verify,
+          verificationToken: newUser.verificationToken,
         },
       });
     } catch (error) {
@@ -80,12 +82,10 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (!user || !user.validPassword(password) || !user.verify) {
-      return res
-        .status(401)
-        .json({
-          message:
-            "Email or password is wrong or you have not verified your email",
-        });
+      return res.status(401).json({
+        message:
+          "Email or password is wrong or you have not verified your email",
+      });
     }
 
     const payload = {

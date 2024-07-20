@@ -19,7 +19,7 @@ router.get("/logout", auth, ctrlAuth.logout);
 router.get("/current", auth, ctrlAuth.getCurrentUser);
 router.patch("/", auth, validateSubscription, ctrlAuth.updateSubscription);
 router.patch("/avatars", auth, upload.single("avatar"), ctrlAuth.updateAvatar);
-router.get("verify/:verificationToken", ctrlVer);
+router.get("/verify/:verificationToken", ctrlVer.verifyUser);
 router.post(
   "/verify",
   validateBody(emailSchema),

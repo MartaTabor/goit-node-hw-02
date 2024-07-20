@@ -10,10 +10,6 @@ const validateBody = (schema) => {
   };
 };
 
-module.exports = {
-  validateBody,
-};
-
 const validateSubscription = (req, res, next) => {
   const { error } = subscriptionSchema.validate(req.body);
 
