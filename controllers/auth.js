@@ -4,6 +4,8 @@ const gravatar = require("gravatar");
 const fs = require("fs").promises;
 const path = require("path");
 const jimp = require("jimp");
+const { uuid } = require("uuidv4");
+const { transporter } = require("../modules/nodemailer");
 
 require("dotenv").config();
 
@@ -18,10 +20,31 @@ const register = async (req, res, next) => {
       return res.status(409).json({ message: "Email in use" });
     }
 
-    const newUser = new User({ email });
+    const verificationToken = uuid();
+
+    const newUser = new User({ email, verificationToken, verify: false });
     newUser.setPassword(password);
     newUser.avatarURL = gravatar.url(email, { protocol: "https", s: "100" });
     await newUser.save();
+
+    const mailOptions = {
+      from: "Contacts Database <no-reply@contacts.com",
+      to: email,
+      subject: "Verify your email",
+      html: `<a href="http://localhost:${
+        process.env.MAIN_PORT || 300
+      }/api/users/verify/${verificationToken}>Verify your email</a>`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .json({ message: "Failed to send verification email" });
+      }
+      console.log("Email sent: " + info.response);
+    });
 
     res.status(201).json({
       status: "success",
