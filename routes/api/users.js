@@ -23,7 +23,7 @@ router.get("/verify/:verificationToken", ctrlVer.verifyUser);
 router.post(
   "/verify",
   validateBody(emailSchema),
-  ctrlAuth.resendVerificationEmail
+  ctrlVer.resendVerificationEmail
 );
 
 module.exports = router;

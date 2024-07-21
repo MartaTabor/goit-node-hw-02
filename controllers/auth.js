@@ -47,35 +47,6 @@ const register = async (req, res, next) => {
   }
 };
 
-const resendVerificationEmail = async (req, res, next) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ message: "Missing required field email" });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-    }
-
-    if (user.verify) {
-      return res
-        .status(400)
-        .json({ message: "Verification has already been passed" });
-    }
-
-    const verificationToken = user.verificationToken;
-    await sendVerificationEmail(email, verificationToken);
-
-    res.status(200).json({ message: "Verification email sent" });
-  } catch (error) {
-    next(error);
-  }
-};
-
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -210,7 +181,6 @@ const updateAvatar = async (req, res, next) => {
 
 module.exports = {
   register,
-  resendVerificationEmail,
   login,
   logout,
   getCurrentUser,
