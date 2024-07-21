@@ -52,13 +52,22 @@ const create = async (req, res, next) => {
   const { name, email, phone } = req.body;
   const userId = req.user._id;
   try {
-    const result = await service.createContact(userId, { name, email, phone });
+    const result = await service.createContact(userId, {
+      name,
+      email,
+      phone,
+    });
     res.status(201).json({
       status: "sucess",
       code: 201,
       data: { contact: result },
     });
   } catch (error) {
+    if (
+      error.message === "Contact with this email already exists for this user"
+    ) {
+      return res.status(409).json({ message: error.message });
+    }
     console.error("Error adding contact: ", error);
     next(error);
   }
@@ -122,6 +131,7 @@ const updateStatus = async (req, res, next) => {
       });
     }
   } catch (error) {
+    console.error("Error updating contact status:", error);
     next(error);
   }
 };

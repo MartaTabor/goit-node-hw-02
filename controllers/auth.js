@@ -34,8 +34,6 @@ const register = async (req, res, next) => {
         user: {
           email: newUser.email,
           subscription: newUser.subscription,
-          verify: newUser.verify,
-          verificationToken: newUser.verificationToken,
         },
       });
     } catch (error) {

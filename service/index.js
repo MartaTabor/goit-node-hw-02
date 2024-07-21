@@ -8,8 +8,19 @@ const getContactById = (userId, contactId) => {
   return Contact.findOne({ _id: contactId, owner: userId });
 };
 
-const createContact = (userId, { name, email, phone }) => {
-  return Contact.create({ name, email, phone, owner: userId });
+const createContact = async (userId, contactData) => {
+  try {
+    const contact = new Contact({
+      ...contactData,
+      owner: userId,
+    });
+    return await contact.save();
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new Error("Contact with this email already exists for this user");
+    }
+    throw error;
+  }
 };
 
 const updateContact = (userId, contactId, fields) => {
