@@ -17,14 +17,13 @@ const sendVerificationEmail = async (email, verificationToken) => {
     from: '"Marta Test 👻" <contact@contact.com>',
     to: email,
     subject: "Verify your email",
-    html: `<a href="http://localhost:${
+    html: `<a href="${process.env.V_URL}:${
       process.env.MAIN_PORT || 3000
     }/api/users/verify/${verificationToken}">Verify your email</a>`,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Verification email sent to: " + email);
   } catch (error) {
     console.error("Error sending verification email: ", error);
     throw error;

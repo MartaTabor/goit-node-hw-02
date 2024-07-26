@@ -22,7 +22,7 @@ const register = async (req, res, next) => {
 
     const verificationToken = uuidv4();
 
-    const newUser = new User({ email, verificationToken, verify: false });
+    const newUser = new User({ email, verificationToken });
     newUser.setPassword(password);
     newUser.avatarURL = gravatar.url(email, { protocol: "https", s: "100" });
     await newUser.save();
