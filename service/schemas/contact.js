@@ -4,11 +4,10 @@ const Schema = mongoose.Schema;
 const contactSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, "Set name for contact"],
   },
   email: {
     type: String,
-    unique: true,
     validate: {
       validator: function (v) {
         return /^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(v);
@@ -25,14 +24,14 @@ const contactSchema = new Schema({
     default: false,
   },
   owner: {
-    type: Schema.Types.ObjectId,
-    ref: "user",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
 });
 
-const Contact = mongoose.model("Contact", contactSchema);
+contactSchema.index({ owner: 1, email: 1 }, { unique: true });
 
-contactSchema.index({ name: 1 });
+const Contact = mongoose.model("Contact", contactSchema);
 
 module.exports = Contact;
