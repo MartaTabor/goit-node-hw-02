@@ -167,7 +167,7 @@ const updateAvatar = async (req, res, next) => {
       status: "success",
       code: 200,
       data: {
-        avatarURL: `http://localhost:${
+        avatarURL: `${process.env.V_URL}:${
           process.env.MAIN_PORT || 3000
         }/${avatarURL}`,
       },
